@@ -1,48 +1,78 @@
+import tkinter as tk
+from tkinter import messagebox
 import random
-from colorama import Fore, Back, Style, init
 
-init(autoreset=True)
+class WordleGUI:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Wordle")
+        self.master.geometry("400x500")
+        self.master.resizable(False, False)
 
-word_list = ["apple", "beach", "chair", "dance", "eagle", "flute", "grape", "house", "igloo", "juice"] # more words need to be added
+        self.word_list = self.load_words("wordle_words.txt")
+        self.secret_word = self.choose_word()
+        self.attempts = 6
+        self.current_row = 0
 
-def choose_word():
-    return random.choice(word_list)
+        self.create_widgets()
 
-def check_guess(secret_word, guess):
-    result = ""
-    for i in range(5):
-        if guess[i] == secret_word[i]:
-            result += f"{Back.GREEN}{Fore.BLACK}{guess[i]}{Style.RESET_ALL}"
-        elif guess[i] in secret_word:
-            result += f"{Back.YELLOW}{Fore.BLACK}{guess[i]}{Style.RESET_ALL}"
-        else:
-            result += f"{Back.LIGHTBLACK_EX}{Fore.WHITE}{guess[i]}{Style.RESET_ALL}"
-    return result
+    def load_words(self, filename):
+        with open(filename, 'r') as file:
+            return [word.strip().upper() for word in file]
 
-def play_wordle():
-    secret_word = choose_word()
-    attempts = 6
-    
-    print("Welcome to Wordle!")
-    print("Guess the 5-letter word. You have 6 attempts.")
-    
-    while attempts > 0:
-        guess = input(f"Attempt {7 - attempts}/6. Enter your guess: ").lower()
-        
-        if len(guess) != 5:
-            print("Please enter a 5-letter word.")
-            continue
-        
-        result = check_guess(secret_word, guess)
-        print(result)
-        
-        if guess == secret_word:
-            print(f"Congratulations! You guessed the word {secret_word}!")
+    def choose_word(self):
+        return random.choice(self.word_list)
+
+    def create_widgets(self):
+        self.grid_frame = tk.Frame(self.master)
+        self.grid_frame.pack(pady=20)
+
+        self.grid = []
+        for i in range(6):
+            row = []
+            for j in range(5):
+                cell = tk.Label(self.grid_frame, width=4, height=2, relief="raised", font=("Arial", 20, "bold"))
+                cell.grid(row=i, column=j, padx=2, pady=2)
+                row.append(cell)
+            self.grid.append(row)
+
+        self.entry = tk.Entry(self.master, font=("Arial", 14))
+        self.entry.pack(pady=10)
+
+        self.submit_button = tk.Button(self.master, text="Submit", command=self.submit_guess)
+        self.submit_button.pack()
+
+    def submit_guess(self):
+        guess = self.entry.get().upper()
+        if len(guess) != 5 or guess not in self.word_list:
+            messagebox.showerror("Invalid Guess", "Please enter a valid 5-letter word.")
             return
-        
-        attempts -= 1
-    
-    print(f"Sorry, you've run out of attempts. The word was {secret_word}.")
+
+        self.check_guess(guess)
+        self.entry.delete(0, tk.END)
+
+        if guess == self.secret_word:
+            messagebox.showinfo("Congratulations!", f"You guessed the word {self.secret_word}!")
+            self.master.quit()
+        elif self.current_row == 5:
+            messagebox.showinfo("Game Over", f"The word was {self.secret_word}.")
+            self.master.quit()
+
+        self.current_row += 1
+
+    def check_guess(self, guess):
+        for i, letter in enumerate(guess):
+            cell = self.grid[self.current_row][i]
+            cell.config(text=letter)
+
+            if letter == self.secret_word[i]:
+                cell.config(bg="green", fg="white")
+            elif letter in self.secret_word:
+                cell.config(bg="yellow", fg="black")
+            else:
+                cell.config(bg="gray", fg="white")
 
 if __name__ == "__main__":
-    play_wordle()
+    root = tk.Tk()
+    wordle_gui = WordleGUI(root)
+    root.mainloop()
