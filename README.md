@@ -42,3 +42,7 @@ The Python Wordle Game is a desktop application built using Python's Tkinter lib
 3. **Winning or Losing**:
    - If you guess the word correctly, a congratulatory message will appear.
    - If you use all six attempts without guessing the word, the correct word will be revealed.
+
+## Example Gameplay
+![Wordle ouput](https://github.com/user-attachments/assets/0072d20d-bd4f-4798-b62f-08b872c34391)
+
