@@ -20,6 +20,7 @@ The Python Wordle Game is a desktop application built using Python's Tkinter lib
     ```bash
     git clone https://github.com/Sebdababo/Python-Wordle-Game.git
     cd Python-Wordle-Game
+    pip install -r requirements.txt
     ```
 
 2. **Run the Application**:
